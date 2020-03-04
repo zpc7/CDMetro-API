@@ -10,13 +10,15 @@ function toInt(str) {
 class UserController extends Controller {
   async index() {
     const ctx = this.ctx;
-    const query = { limit: toInt(ctx.query.limit), offset: toInt(ctx.query.offset) };
-    ctx.body = await ctx.model.User.findAll(query);
+    const { page = 1, pageSize = 1 } = ctx.query;
+    const query = { limit: toInt(pageSize), offset: (toInt(page) - 1) * toInt(pageSize) };
+    ctx.body = await ctx.service.user.findAll(query);
   }
 
   async show() {
     const ctx = this.ctx;
-    ctx.body = await ctx.model.User.findByPk(toInt(ctx.params.id));
+    const id = toInt(ctx.params.id);
+    ctx.body = await ctx.service.user.findById(id);
   }
 
   async create() {
@@ -30,21 +32,20 @@ class UserController extends Controller {
   async update() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const user = await ctx.model.User.findByPk(id);
+    const user = await ctx.service.user.findById(id);
     if (!user) {
       ctx.status = 404;
       return;
     }
 
-    const { name, age } = ctx.request.body;
-    await user.update({ name, age });
+    await user.update(ctx.request.body);
     ctx.body = user;
   }
 
   async destroy() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const user = await ctx.model.User.findByPk(id);
+    const user = await ctx.service.user.findById(id);
     if (!user) {
       ctx.status = 404;
       return;

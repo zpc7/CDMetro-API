@@ -1,6 +1,7 @@
 'use strict';
 const Service = require('egg').Service;
 
+// 日期类型简写-全称对照表
 const enumCompareBoard = {
   NWD: 'normal working days',
   TDBH: 'the day before holiday',
@@ -8,15 +9,19 @@ const enumCompareBoard = {
 };
 
 class UserService extends Service {
-  async find(uid) {
-    const user = await this.ctx.db.query('select * from user where uid = ?', uid);
-    return user;
+  async findAll(query) {
+    const total = await this.ctx.model.User.count();
+    const list = await this.ctx.model.User.findAll(query);
+    return { total, list };
   }
-  async create(body) {
+  async findById(id) {
+    return await this.ctx.model.User.findByPk(id);
+  }
+  async create(requestBody) {
     const {
       date, dateType, remark = '',
       lineAmountNo1 = 0, lineAmountNo2 = 0, lineAmountNo3 = 0,
-    } = body;
+    } = requestBody;
 
     return await this.ctx.model.User.create({
       date,
