@@ -9,9 +9,9 @@ module.exports = app => {
       primaryKey: true,
       autoIncrement: true,
     },
-    lineNo: INTEGER,
-    lineColor: STRING(10),
-    openDate: STRING(10),
+    lineNumber: INTEGER, // 线路编号
+    lineColor: STRING(10), // 线路主题颜色
+    openDate: STRING(10), // 线路开通时间
   });
 
   return Line;

@@ -7,53 +7,53 @@ function toInt(str) {
   return parseInt(str, 10) || 0;
 }
 
-class UserController extends Controller {
+class PassengerAmonutController extends Controller {
   async index() {
     const ctx = this.ctx;
     const { page = 1, pageSize = 1 } = ctx.query;
     const query = { limit: toInt(pageSize), offset: (toInt(page) - 1) * toInt(pageSize) };
-    ctx.body = await ctx.service.user.findAll(query);
+    ctx.body = await ctx.service.passengerAmount.findAll(query);
   }
 
   async show() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    ctx.body = await ctx.service.user.findById(id);
+    ctx.body = await ctx.service.passengerAmount.findById(id);
   }
 
   async create() {
     const ctx = this.ctx;
 
-    const user = await ctx.service.user.create(ctx.request.body);
+    const passengerAmount = await ctx.service.passengerAmount.create(ctx.request.body);
     ctx.status = 201;
-    ctx.body = user;
+    ctx.body = passengerAmount;
   }
 
   async update() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const user = await ctx.service.user.findById(id);
-    if (!user) {
+    const passengerAmount = await ctx.service.passengerAmount.findById(id);
+    if (!passengerAmount) {
       ctx.status = 404;
       return;
     }
 
-    await user.update(ctx.request.body);
-    ctx.body = user;
+    await passengerAmount.update(ctx.request.body);
+    ctx.body = passengerAmount;
   }
 
   async destroy() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const user = await ctx.service.user.findById(id);
-    if (!user) {
+    const passengerAmount = await ctx.service.passengerAmount.findById(id);
+    if (!passengerAmount) {
       ctx.status = 404;
       return;
     }
 
-    await user.destroy();
+    await passengerAmount.destroy();
     ctx.status = 200;
   }
 }
 
-module.exports = UserController;
+module.exports = PassengerAmonutController;

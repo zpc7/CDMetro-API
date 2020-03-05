@@ -12,9 +12,9 @@ class LineService extends Service {
     return await this.ctx.model.Line.findByPk(id);
   }
   async create(requestBody) {
-    const { lineColor, lineNo, openDate } = requestBody;
+    const { lineColor, lineNumber, openDate } = requestBody;
 
-    return await this.ctx.model.Line.create({ lineColor, lineNo, openDate });
+    return await this.ctx.model.Line.create({ lineColor, lineNumber, openDate });
   }
 }
 
