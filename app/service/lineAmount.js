@@ -10,18 +10,18 @@ const enumCompareBoard = {
 
 class LineAmountService extends Service {
   async findAll(query) {
-    const total = await this.ctx.model.PassengerAmount.count();
-    const list = await this.ctx.model.PassengerAmount.findAll(query);
+    const total = await this.ctx.model.LineAmount.count();
+    const list = await this.ctx.model.LineAmount.findAll(query);
     return { total, list };
   }
   async findById(id) {
-    return await this.ctx.model.PassengerAmount.findByPk(id);
+    return await this.ctx.model.LineAmount.findByPk(id);
   }
   async create(requestBody) {
-    const { date, dateType, remark, lineId, lineAmount } = requestBody;
+    const { date, dateType, remark, lineId, amount } = requestBody;
 
-    return await this.ctx.model.PassengerAmount.create({
-      date, dateType, remark, lineId, lineAmount,
+    return await this.ctx.model.LineAmount.create({
+      date, dateType, remark, lineId, amount,
     });
   }
 }
