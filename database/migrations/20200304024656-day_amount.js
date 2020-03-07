@@ -3,7 +3,7 @@
 module.exports = {
   // 在执行数据库升级时调用的函数，创建 day_amount 表
   up: async (queryInterface, Sequelize) => {
-    const { INTEGER, STRING, ENUM, DATE } = Sequelize;
+    const { INTEGER, STRING, ENUM, DATE, DECIMAL } = Sequelize;
     await queryInterface.createTable('day_amount', {
       id: {
         type: INTEGER,
@@ -12,7 +12,7 @@ module.exports = {
       },
       date: STRING(10),
       dateType: ENUM('NWD', 'TDBH', 'SH'),
-      total: INTEGER,
+      total: DECIMAL(10, 2),
       createdAt: DATE,
       updatedAt: DATE,
     });
