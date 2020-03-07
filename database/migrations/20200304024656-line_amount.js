@@ -13,7 +13,7 @@ module.exports = {
       date: STRING(10),
       dateType: ENUM('NWD', 'TDBH', 'SH'),
       lineId: INTEGER,
-      amount: DECIMAL(10, 2),
+      amount: DECIMAL(10, 2).UNSIGNED,
       createdAt: DATE,
       updatedAt: DATE,
     });

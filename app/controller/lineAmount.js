@@ -24,6 +24,31 @@ class LineAmonutController extends Controller {
   async create() {
     const ctx = this.ctx;
 
+    try {
+      const rule = {
+        date: 'date',
+        dateType: {
+          type: 'enum',
+          values: ['NWD', 'TDBH', 'SH'],
+        },
+        amount: {
+          type: 'string',
+          format: /^(([1-9]\d*)|0)(\.\d{1,2})?$/,
+        },
+        lineId: {
+          type: 'int',
+        },
+      };
+      // 如果不传第二个参数会自动校验 `ctx.request.body`
+      ctx.validate(rule, ctx.request.body);
+
+    } catch (err) {
+      ctx.logger.warn(err.errors);
+      ctx.body = { message: '参数错误', err: err.errors };
+      ctx.status = 422;
+      return;
+    }
+
     const lineAmount = await ctx.service.lineAmount.create(ctx.request.body);
     ctx.status = 201;
     ctx.body = lineAmount;
