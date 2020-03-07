@@ -7,7 +7,7 @@ function toInt(str) {
   return parseInt(str, 10) || 0;
 }
 
-class PassengerAmonutController extends Controller {
+class LineAmonutController extends Controller {
   async index() {
     const ctx = this.ctx;
     const { page = 1, pageSize = 1 } = ctx.query;
@@ -56,4 +56,4 @@ class PassengerAmonutController extends Controller {
   }
 }
 
-module.exports = PassengerAmonutController;
+module.exports = LineAmonutController;

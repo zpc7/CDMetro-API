@@ -8,7 +8,7 @@ const enumCompareBoard = {
   SH: 'statutory holidays',
 };
 
-class PassengerAmountService extends Service {
+class LineAmountService extends Service {
   async findAll(query) {
     const total = await this.ctx.model.PassengerAmount.count();
     const list = await this.ctx.model.PassengerAmount.findAll(query);
@@ -26,4 +26,4 @@ class PassengerAmountService extends Service {
   }
 }
 
-module.exports = PassengerAmountService;
+module.exports = LineAmountService;
