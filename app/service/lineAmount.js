@@ -33,12 +33,20 @@ class LineAmountService extends Service {
             lineId: item.lineId,
             lineAmount: item.amount,
           }],
+          sum: '',
         });
       } else {
         response.list[key].lineData.push({
           lineId: item.lineId,
           lineAmount: item.amount,
         });
+      }
+    });
+    const totalFromTableDayAmount = await ctx.model.DayAmount.findAll({ attributes: ['date', 'total'] });
+    totalFromTableDayAmount.forEach(item => {
+      const singleListIndex = _.findIndex(response.list, o => o.date === item.date);
+      if (singleListIndex !== -1) {
+        response.list[singleListIndex].sum = item.total;
       }
     });
     return response;
