@@ -11,6 +11,7 @@
     "egg-scripts": "^2.13.0",
     "egg-sequelize": "^5.2.1",
     "egg-validate": "^2.0.2",
+    "lodash": "^4.17.15",
     "mysql2": "^2.1.0"
   },
   "devDependencies": {
