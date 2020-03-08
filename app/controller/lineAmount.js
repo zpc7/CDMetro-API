@@ -45,7 +45,7 @@ class LineAmonutController extends Controller {
     } catch (err) {
       ctx.logger.warn(err.errors);
       ctx.body = { message: '参数错误', err: err.errors };
-      ctx.status = 422;
+      ctx.status = 500;
       return;
     }
 

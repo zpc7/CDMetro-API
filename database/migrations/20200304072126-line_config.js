@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      lineNumber: INTEGER,
+      lineNumber: STRING(3),
       lineColor: STRING(10),
       lineType: STRING(3),
       openDate: STRING(10),
