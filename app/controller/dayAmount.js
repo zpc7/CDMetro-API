@@ -10,7 +10,7 @@ function toInt(str) {
 class DayAmountController extends Controller {
   async index() {
     const ctx = this.ctx;
-    const { page = 1, pageSize = 1 } = ctx.query;
+    const { page = 1, pageSize = 10 } = ctx.query;
     const query = { limit: toInt(pageSize), offset: (toInt(page) - 1) * toInt(pageSize) };
     ctx.body = await ctx.service.dayAmount.findAll(query);
   }
@@ -29,7 +29,7 @@ class DayAmountController extends Controller {
         date: 'date',
         dateType: {
           type: 'enum',
-          values: ['NWD', 'TDBH', 'SH'],
+          values: [ 'NWD', 'TDBH', 'SH' ],
         },
         lineData: {
           type: 'array',
@@ -83,7 +83,11 @@ class DayAmountController extends Controller {
       return;
     }
 
+    // 删除某一条数据,需要删除该条数据日期(date)下的所有线路数据(line_amount)
+    // 删除 表 day_amount 中的数据
     await dayAmount.destroy();
+    // 删除 表 line_amount 中的数据
+    await ctx.service.lineAmount.deleteByDate(dayAmount.date);
     ctx.status = 200;
   }
 }

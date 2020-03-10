@@ -23,7 +23,7 @@ class LineAmountService extends Service {
     const list = await this.ctx.model.LineAmount.findAll();
 
     list.forEach(item => {
-      const key = _.findIndex(response.list, ['date', item.date]);
+      const key = _.findIndex(response.list, [ 'date', item.date ]);
       if (key === -1) {
         response.list.push({
           id: item.id,
@@ -42,7 +42,7 @@ class LineAmountService extends Service {
         });
       }
     });
-    const totalFromTableDayAmount = await ctx.model.DayAmount.findAll({ attributes: ['date', 'total'] });
+    const totalFromTableDayAmount = await ctx.model.DayAmount.findAll({ attributes: [ 'date', 'total' ] });
     totalFromTableDayAmount.forEach(item => {
       const singleListIndex = _.findIndex(response.list, o => o.date === item.date);
       if (singleListIndex !== -1) {
@@ -60,6 +60,11 @@ class LineAmountService extends Service {
     return await this.ctx.model.LineAmount.create({
       date, dateType, remark, lineId, amount,
     });
+  }
+  // 通过日期删除数据
+  async deleteByDate(date) {
+    const ctx = this.ctx;
+    await ctx.model.LineAmount.destroy({ where: { date } });
   }
 }
 

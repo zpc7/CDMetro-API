@@ -9,43 +9,28 @@ class DayAmountService extends Service {
       total: 0,
       list: [],
     };
-    // TODO: 处理查询参数
-    console.log('------------');
-    console.log('query', query);
-    response.total = await ctx.model.DayAmount.count();
-    const list = await this.ctx.model.LineAmount.findAll();
 
-    list.forEach(item => {
-      const key = _.findIndex(response.list, ['date', item.date]);
-      if (key === -1) {
-        response.list.push({
-          id: item.id,
-          date: item.date,
-          dateType: item.dateType,
-          lineData: [{
-            lineId: item.lineId,
-            lineAmount: item.amount,
-          }],
-          sum: '',
-        });
-      } else {
-        response.list[key].lineData.push({
-          lineId: item.lineId,
-          lineAmount: item.amount,
-        });
-      }
-    });
-    const totalFromTableDayAmount = await ctx.model.DayAmount.findAll({ attributes: ['date', 'total'] });
-    totalFromTableDayAmount.forEach(item => {
-      const singleListIndex = _.findIndex(response.list, o => o.date === item.date);
-      if (singleListIndex !== -1) {
-        response.list[singleListIndex].sum = item.total;
-      }
-    });
+    response.total = await ctx.model.DayAmount.count();
+    const list = await ctx.model.DayAmount.findAll({ ...query, order: [[ 'date', 'DESC' ]] });
+
+    for (const item of list) {
+      const lineData = await ctx.model.LineAmount.findAll({
+        attributes: [ 'lineId', 'amount' ],
+        where: { date: item.date },
+      });
+      response.list.push({
+        id: item.id,
+        date: item.date,
+        dateType: item.dateType,
+        lineData: lineData.map(v => ({ lineId: v.lineId, lineAmount: v.amount })),
+        sum: item.total,
+      });
+    }
+
     return response;
   }
   async findById(id) {
-    return await this.ctx.model.LineAmount.findByPk(id);
+    return await this.ctx.model.DayAmount.findByPk(id);
   }
   async create(requestBody) {
     const { date, dateType, lineData, sum } = requestBody;
