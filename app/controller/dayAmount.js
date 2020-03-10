@@ -76,7 +76,7 @@ class DayAmountController extends Controller {
       throw new Error('更新失败! 源数据id不存在');
     }
 
-    ctx.body = await ctx.service.dayAmount.update(id, ctx.request.body);
+    ctx.body = await ctx.service.dayAmount.update({ id, previousDate: dayAmount.date }, ctx.request.body);
   }
 
   async destroy() {

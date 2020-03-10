@@ -62,7 +62,7 @@ class DayAmountService extends Service {
     }
     throw new Error(`日期 ${date} 已有值, 新增失败!`);
   }
-  async update(id, requestBody) {
+  async update({ id, previousDate }, requestBody) {
     const ctx = this.ctx;
     const Op = this.app.Sequelize.Op;
     const { date, dateType, sum: total, lineData } = requestBody;
@@ -76,7 +76,7 @@ class DayAmountService extends Service {
         await ctx.model.LineAmount.update({
           date, dateType, amount: item.lineAmount,
         }, {
-          where: { date, lineId: item.lineId },
+          where: { date: previousDate, lineId: item.lineId },
         });
       }
       // 更新数据
