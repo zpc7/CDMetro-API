@@ -7,18 +7,18 @@ function toInt(str) {
   return parseInt(str, 10) || 0;
 }
 
-class LineAmountController extends Controller {
+class DayAmountController extends Controller {
   async index() {
     const ctx = this.ctx;
     const { page = 1, pageSize = 1 } = ctx.query;
     const query = { limit: toInt(pageSize), offset: (toInt(page) - 1) * toInt(pageSize) };
-    ctx.body = await ctx.service.lineAmount.findAll(query);
+    ctx.body = await ctx.service.dayAmount.findAll(query);
   }
 
   async show() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    ctx.body = await ctx.service.lineAmount.findById(id);
+    ctx.body = await ctx.service.dayAmount.findById(id);
   }
 
   async create() {
@@ -31,15 +31,22 @@ class LineAmountController extends Controller {
           type: 'enum',
           values: ['NWD', 'TDBH', 'SH'],
         },
-        amount: {
+        lineData: {
+          type: 'array',
+          itemType: 'object',
+          rule: {
+            lineId: 'int',
+            lineAmount: {
+              type: 'string',
+              format: /^(([1-9]\d*)|0)(\.\d{1,2})?$/,
+            },
+          },
+        },
+        sum: {
           type: 'string',
           format: /^(([1-9]\d*)|0)(\.\d{1,2})?$/,
         },
-        lineId: {
-          type: 'int',
-        },
       };
-      // 如果不传第二个参数会自动校验 `ctx.request.body`
       ctx.validate(rule, ctx.request.body);
 
     } catch (err) {
@@ -49,36 +56,36 @@ class LineAmountController extends Controller {
       return;
     }
 
-    const lineAmount = await ctx.service.lineAmount.create(ctx.request.body);
+    const res = await ctx.service.dayAmount.create(ctx.request.body);
     ctx.status = 201;
-    ctx.body = lineAmount;
+    ctx.body = res;
   }
 
   async update() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const lineAmount = await ctx.service.lineAmount.findById(id);
-    if (!lineAmount) {
+    const dayAmount = await ctx.service.dayAmount.findById(id);
+    if (!dayAmount) {
       ctx.status = 404;
       return;
     }
 
-    await lineAmount.update(ctx.request.body);
-    ctx.body = lineAmount;
+    await dayAmount.update(ctx.request.body);
+    ctx.body = dayAmount;
   }
 
   async destroy() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const lineAmount = await ctx.service.lineAmount.findById(id);
-    if (!lineAmount) {
+    const dayAmount = await ctx.service.dayAmount.findById(id);
+    if (!dayAmount) {
       ctx.status = 404;
       return;
     }
 
-    await lineAmount.destroy();
+    await dayAmount.destroy();
     ctx.status = 200;
   }
 }
 
-module.exports = LineAmountController;
+module.exports = DayAmountController;
