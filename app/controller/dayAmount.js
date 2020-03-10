@@ -10,8 +10,14 @@ function toInt(str) {
 class DayAmountController extends Controller {
   async index() {
     const ctx = this.ctx;
-    const { page = 1, pageSize = 10 } = ctx.query;
-    const query = { limit: toInt(pageSize), offset: (toInt(page) - 1) * toInt(pageSize) };
+    const { page = 1, pageSize = 10, startDate, endDate, dateType } = ctx.query;
+    const query = {
+      limit: toInt(pageSize),
+      offset: (toInt(page) - 1) * toInt(pageSize),
+      startDate,
+      endDate,
+      dateType,
+    };
     ctx.body = await ctx.service.dayAmount.findAll(query);
   }
 
