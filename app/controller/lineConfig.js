@@ -7,51 +7,51 @@ function toInt(str) {
   return parseInt(str, 10) || 0;
 }
 
-class LineController extends Controller {
+class LineConfigController extends Controller {
   async index() {
     const ctx = this.ctx;
-    ctx.body = await ctx.service.line.findAll();
+    ctx.body = await ctx.service.lineConfig.findAll();
   }
 
   async show() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    ctx.body = await ctx.service.line.findById(id);
+    ctx.body = await ctx.service.lineConfig.findById(id);
   }
 
   async create() {
     const ctx = this.ctx;
 
-    const line = await ctx.service.line.create(ctx.request.body);
+    const lineConfig = await ctx.service.lineConfig.create(ctx.request.body);
     ctx.status = 201;
-    ctx.body = line;
+    ctx.body = lineConfig;
   }
 
   async update() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const line = await ctx.service.line.findById(id);
-    if (!line) {
+    const lineConfig = await ctx.service.lineConfig.findById(id);
+    if (!lineConfig) {
       ctx.status = 404;
       return;
     }
 
-    await line.update(ctx.request.body);
-    ctx.body = line;
+    await lineConfig.update(ctx.request.body);
+    ctx.body = lineConfig;
   }
 
   async destroy() {
     const ctx = this.ctx;
     const id = toInt(ctx.params.id);
-    const line = await ctx.service.line.findById(id);
-    if (!line) {
+    const lineConfig = await ctx.service.lineConfig.findById(id);
+    if (!lineConfig) {
       ctx.status = 404;
       return;
     }
 
-    await line.destroy();
+    await lineConfig.destroy();
     ctx.status = 200;
   }
 }
 
-module.exports = LineController;
+module.exports = LineConfigController;

@@ -3,7 +3,7 @@
 module.exports = app => {
   const { STRING, INTEGER } = app.Sequelize;
 
-  const Line = app.model.define('line_config', {
+  const LineConfig = app.model.define('line_config', {
     id: {
       type: INTEGER,
       primaryKey: true,
@@ -15,5 +15,5 @@ module.exports = app => {
     openDate: STRING(10), // 线路开通时间
   });
 
-  return Line;
+  return LineConfig;
 };

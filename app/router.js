@@ -11,5 +11,5 @@ module.exports = app => {
   // lineAmount: 单条线路的运营数据
   router.resources('lineAmount', '/lineAmount', controller.lineAmount);
   // lineConfig: 线路基础配置
-  router.resources('lineConfig', '/lineConfig', controller.line);
+  router.resources('lineConfig', '/lineConfig', controller.lineConfig);
 };
