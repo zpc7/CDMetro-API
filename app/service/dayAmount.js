@@ -10,22 +10,23 @@ class DayAmountService extends Service {
       list: [],
     };
     // 组合查询条件
-    const modelWhereQuery = { where: {} };
+    let whereQuery = {};
     if (startDate && endDate) {
-      modelWhereQuery.where = {
+      whereQuery = {
         date: {
           [Op.between]: [startDate, endDate],
         },
       };
     }
     if (dateType) {
-      modelWhereQuery.where = { ...modelWhereQuery.where, dateType };
+      whereQuery = { ...whereQuery, dateType };
     }
 
     response.total = await ctx.model.DayAmount.count();
-    const list = await ctx.model.DayAmount.findAll({ limit, offset, ...modelWhereQuery, order: [['date', 'DESC']] });
+    const list = await ctx.model.DayAmount.findAll({ limit, offset, where: { ...whereQuery }, order: [['date', 'DESC']] });
 
     for (const item of list) {
+      // 按照日期查询表 line_amount 的数据
       const lineData = await ctx.model.LineAmount.findAll({
         attributes: ['lineId', 'amount'],
         where: { date: item.date },
@@ -73,11 +74,13 @@ class DayAmountService extends Service {
     if (dateCount === 0) {
       // 依次更新单条线路数据
       for (const item of lineData) {
-        await ctx.model.LineAmount.update({
-          date, dateType, amount: item.lineAmount,
-        }, {
-          where: { date: previousDate, lineId: item.lineId },
-        });
+        // 如果需要更新的位置,没有数据,则添加(发生于新增线路后编辑历史数据的情况)
+        const lineInfo = await ctx.model.LineAmount.findOne({ where: { date: previousDate, lineId: item.lineId } });
+        if (lineInfo) {
+          await lineInfo.update({ date, dateType, amount: item.lineAmount });
+        } else {
+          await ctx.model.LineAmount.create({ date, dateType, lineId: item.lineId, amount: item.lineAmount });
+        }
       }
       // 更新数据
       await ctx.model.DayAmount.update({ date, dateType, total }, { where: { id } });
