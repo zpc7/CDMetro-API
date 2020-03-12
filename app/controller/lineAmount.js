@@ -29,7 +29,7 @@ class LineAmountController extends Controller {
         date: 'date',
         dateType: {
           type: 'enum',
-          values: ['NWD', 'TDBH', 'SH'],
+          values: [ 'NWD', 'TDBH', 'SH' ],
         },
         amount: {
           type: 'string',

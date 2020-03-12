@@ -16,7 +16,7 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_1583243431180_1943';
 
   // add your middleware config here
-  config.middleware = ['notfoundHandler'];
+  config.middleware = [ 'notfoundHandler' ];
   // sequelize
   config.sequelize = {
     dialect: 'mysql',

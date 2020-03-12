@@ -35,7 +35,7 @@ class DayAmountController extends Controller {
         date: 'date',
         dateType: {
           type: 'enum',
-          values: ['NWD', 'TDBH', 'SH'],
+          values: [ 'NWD', 'TDBH', 'SH' ],
         },
         lineData: {
           type: 'array',

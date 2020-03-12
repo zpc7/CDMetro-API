@@ -5,7 +5,7 @@ const Service = require('egg').Service;
 class LineConfigService extends Service {
   async findAll() {
     const total = await this.ctx.model.LineConfig.count();
-    const list = await this.ctx.model.LineConfig.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] } });
+    const list = await this.ctx.model.LineConfig.findAll({ attributes: { exclude: [ 'createdAt', 'updatedAt' ] } });
     return { total, list };
   }
   async findById(id) {

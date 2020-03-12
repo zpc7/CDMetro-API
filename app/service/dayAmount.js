@@ -14,7 +14,7 @@ class DayAmountService extends Service {
     if (startDate && endDate) {
       whereQuery = {
         date: {
-          [Op.between]: [startDate, endDate],
+          [Op.between]: [ startDate, endDate ],
         },
       };
     }
@@ -29,7 +29,7 @@ class DayAmountService extends Service {
     const list = await ctx.model.DayAmount.findAll({
       limit, offset,
       where: { ...whereQuery },
-      order: [['date', orderType]],
+      order: [[ 'date', orderType ]],
     });
 
     for (const item of list) {
@@ -47,7 +47,7 @@ class DayAmountService extends Service {
   async getLineDataByModelDayAmount(ModelDayAmount) {
     const item = ModelDayAmount;
     const lineData = await this.ctx.model.LineAmount.findAll({
-      attributes: ['lineId', 'amount'],
+      attributes: [ 'lineId', 'amount' ],
       where: { date: item.date },
     });
     return {
@@ -61,7 +61,7 @@ class DayAmountService extends Service {
   // 获取最近一天的数据
   async findLastestData() {
     const ctx = this.ctx;
-    const DayAmount = await ctx.model.DayAmount.findAll({ limit: 1 });
+    const DayAmount = await ctx.model.DayAmount.findAll({ limit: 1, order: [[ 'date', 'DESC' ]] });
     return await ctx.service.dayAmount.getLineDataByModelDayAmount(DayAmount[0]);
   }
 
