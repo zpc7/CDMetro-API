@@ -9,7 +9,7 @@ class DayAmountService extends Service {
       total: 0,
       list: [],
     };
-    // 组合查询条件
+    // 组合 where 查询条件
     let whereQuery = {};
     if (startDate && endDate) {
       whereQuery = {
@@ -21,30 +21,54 @@ class DayAmountService extends Service {
     if (dateType) {
       whereQuery = { ...whereQuery, dateType };
     }
+    // 兼容analysis的访问 limit ? 'DESC' : 'ASC';
+    // 不传limit表示给 '/analysis' 使用
+    const orderType = limit ? 'ASC' : 'ASC';
 
     response.total = await ctx.model.DayAmount.count();
-    const list = await ctx.model.DayAmount.findAll({ limit, offset, where: { ...whereQuery }, order: [['date', 'DESC']] });
+    const list = await ctx.model.DayAmount.findAll({
+      limit, offset,
+      where: { ...whereQuery },
+      order: [['date', orderType]],
+    });
 
     for (const item of list) {
-      // 按照日期查询表 line_amount 的数据
-      const lineData = await ctx.model.LineAmount.findAll({
-        attributes: ['lineId', 'amount'],
-        where: { date: item.date },
-      });
-      response.list.push({
-        id: item.id,
-        date: item.date,
-        dateType: item.dateType,
-        lineData: lineData.map(v => ({ lineId: v.lineId, lineAmount: v.amount })),
-        sum: item.total,
-      });
+      const dayAmountData = await ctx.service.dayAmount.getLineDataByModelDayAmount(item);
+      response.list.push(dayAmountData);
     }
 
     return response;
   }
+
+  /**
+   * 通过日期查询和组装 表 line_amount 的线路数据
+  * @param {Model finaAllResponseListItem} ModelDayAmount
+   */
+  async getLineDataByModelDayAmount(ModelDayAmount) {
+    const item = ModelDayAmount;
+    const lineData = await this.ctx.model.LineAmount.findAll({
+      attributes: ['lineId', 'amount'],
+      where: { date: item.date },
+    });
+    return {
+      id: item.id,
+      date: item.date,
+      dateType: item.dateType,
+      lineData: lineData.map(v => ({ lineId: v.lineId, lineAmount: v.amount })),
+      sum: item.total,
+    };
+  }
+  // 获取最近一天的数据
+  async findLastestData() {
+    const ctx = this.ctx;
+    const DayAmount = await ctx.model.DayAmount.findAll({ limit: 1 });
+    return await ctx.service.dayAmount.getLineDataByModelDayAmount(DayAmount[0]);
+  }
+
   async findById(id) {
     return await this.ctx.model.DayAmount.findByPk(id);
   }
+
   async create(requestBody) {
     const ctx = this.ctx;
     const { date, dateType, lineData, sum: total } = requestBody;
