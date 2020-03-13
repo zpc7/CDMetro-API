@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
 module.exports = app => {
-  const { STRING, INTEGER } = app.Sequelize;
+  const { STRING, INTEGER } = app.Sequelize
 
   const LineConfig = app.model.define('line_config', {
     id: {
@@ -13,7 +13,7 @@ module.exports = app => {
     lineColor: STRING(10), // 线路主题颜色
     lineType: STRING(3), // 线路类型
     openDate: STRING(10), // 线路开通时间
-  });
+  })
 
-  return LineConfig;
-};
+  return LineConfig
+}

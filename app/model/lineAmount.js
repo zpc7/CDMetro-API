@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
 module.exports = app => {
-  const { STRING, INTEGER, ENUM, DECIMAL } = app.Sequelize;
+  const { STRING, INTEGER, ENUM, DECIMAL } = app.Sequelize
 
   const LineAmount = app.model.define('line_amount', {
     id: {
@@ -13,7 +13,7 @@ module.exports = app => {
     dateType: ENUM('NWD', 'TDBH', 'SH'), // 日期类型(普通工作日 假期前一天 法定节假日)
     lineId: INTEGER, // 线路Id(注意不是线路编号)
     amount: DECIMAL(10, 2).UNSIGNED, // 线路客运量
-  });
+  })
 
-  return LineAmount;
-};
+  return LineAmount
+}

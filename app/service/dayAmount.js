@@ -1,117 +1,117 @@
-'use strict';
-const Service = require('egg').Service;
+'use strict'
+const Service = require('egg').Service
 
 class DayAmountService extends Service {
   async findAll({ limit, offset, startDate, endDate, dateType }) {
-    const ctx = this.ctx;
-    const Op = this.app.Sequelize.Op;
+    const ctx = this.ctx
+    const Op = this.app.Sequelize.Op
     const response = {
       total: 0,
       list: [],
-    };
+    }
     // 组合 where 查询条件
-    let whereQuery = {};
+    let whereQuery = {}
     if (startDate && endDate) {
       whereQuery = {
         date: {
-          [Op.between]: [ startDate, endDate ],
+          [Op.between]: [startDate, endDate],
         },
-      };
+      }
     }
     if (dateType) {
-      whereQuery = { ...whereQuery, dateType };
+      whereQuery = { ...whereQuery, dateType }
     }
     // 兼容analysis的访问 limit ? 'DESC' : 'ASC';
     // 不传limit表示给 '/analysis' 使用
-    const orderType = limit ? 'ASC' : 'ASC';
+    const orderType = limit ? 'ASC' : 'ASC'
 
-    response.total = await ctx.model.DayAmount.count();
+    response.total = await ctx.model.DayAmount.count()
     const list = await ctx.model.DayAmount.findAll({
       limit, offset,
       where: { ...whereQuery },
-      order: [[ 'date', orderType ]],
-    });
+      order: [['date', orderType]],
+    })
 
     for (const item of list) {
-      const dayAmountData = await ctx.service.dayAmount.getLineDataByModelDayAmount(item);
-      response.list.push(dayAmountData);
+      const dayAmountData = await ctx.service.dayAmount.getLineDataByModelDayAmount(item)
+      response.list.push(dayAmountData)
     }
 
-    return response;
+    return response
   }
 
   /**
    * 通过日期查询和组装 表 line_amount 的线路数据
-  * @param {Model finaAllResponseListItem} ModelDayAmount
+  * @param {Model finaAllResponseListItem} ModelDayAmount 表day_amount中查询出来的一行
    */
   async getLineDataByModelDayAmount(ModelDayAmount) {
-    const item = ModelDayAmount;
+    const item = ModelDayAmount
     const lineData = await this.ctx.model.LineAmount.findAll({
-      attributes: [ 'lineId', 'amount' ],
+      attributes: ['lineId', 'amount'],
       where: { date: item.date },
-    });
+    })
     return {
       id: item.id,
       date: item.date,
       dateType: item.dateType,
       lineData: lineData.map(v => ({ lineId: v.lineId, lineAmount: v.amount })),
       sum: item.total,
-    };
+    }
   }
   // 获取最近一天的数据
   async findLastestData() {
-    const ctx = this.ctx;
-    const DayAmount = await ctx.model.DayAmount.findAll({ limit: 1, order: [[ 'date', 'DESC' ]] });
-    return await ctx.service.dayAmount.getLineDataByModelDayAmount(DayAmount[0]);
+    const ctx = this.ctx
+    const DayAmount = await ctx.model.DayAmount.findAll({ limit: 1, order: [['date', 'DESC']] })
+    return await ctx.service.dayAmount.getLineDataByModelDayAmount(DayAmount[0])
   }
 
   async findById(id) {
-    return await this.ctx.model.DayAmount.findByPk(id);
+    return await this.ctx.model.DayAmount.findByPk(id)
   }
 
   async create(requestBody) {
-    const ctx = this.ctx;
-    const { date, dateType, lineData, sum: total } = requestBody;
+    const ctx = this.ctx
+    const { date, dateType, lineData, sum: total } = requestBody
     // 如果新增的日期在表 day_amount 已经存在,则新增失败
-    const dateCount = await ctx.model.DayAmount.count({ where: { date } });
+    const dateCount = await ctx.model.DayAmount.count({ where: { date } })
     if (dateCount === 0) {
       // 依次新增单条线路数据
       for (const item of lineData) {
         await ctx.model.LineAmount.create({
           date, dateType, lineId: item.lineId, amount: item.lineAmount,
-        });
+        })
       }
       // 更新数据(这里的sum依靠前端的req 是否需要自己累加)
-      const newDayAmount = await ctx.model.DayAmount.create({ date, dateType, total });
-      return { message: '新增成功', id: newDayAmount.id };
+      const newDayAmount = await ctx.model.DayAmount.create({ date, dateType, total })
+      return { message: '新增成功', id: newDayAmount.id }
     }
-    throw new Error(`日期 ${date} 已有值, 新增失败!`);
+    throw new Error(`日期 ${date} 已有值, 新增失败!`)
   }
   async update({ id, previousDate }, requestBody) {
-    const ctx = this.ctx;
-    const Op = this.app.Sequelize.Op;
-    const { date, dateType, sum: total, lineData } = requestBody;
+    const ctx = this.ctx
+    const Op = this.app.Sequelize.Op
+    const { date, dateType, sum: total, lineData } = requestBody
     // 如果更新的日期在表 day_amount 已经存在(非自身),则新增失败
     const dateCount = await ctx.model.DayAmount.count({
       where: { date, id: { [Op.ne]: id } },
-    });
+    })
     if (dateCount === 0) {
       // 依次更新单条线路数据
       for (const item of lineData) {
         // 如果需要更新的位置,没有数据,则添加(发生于新增线路后编辑历史数据的情况)
-        const lineInfo = await ctx.model.LineAmount.findOne({ where: { date: previousDate, lineId: item.lineId } });
+        const lineInfo = await ctx.model.LineAmount.findOne({ where: { date: previousDate, lineId: item.lineId } })
         if (lineInfo) {
-          await lineInfo.update({ date, dateType, amount: item.lineAmount });
+          await lineInfo.update({ date, dateType, amount: item.lineAmount })
         } else {
-          await ctx.model.LineAmount.create({ date, dateType, lineId: item.lineId, amount: item.lineAmount });
+          await ctx.model.LineAmount.create({ date, dateType, lineId: item.lineId, amount: item.lineAmount })
         }
       }
       // 更新数据
-      await ctx.model.DayAmount.update({ date, dateType, total }, { where: { id } });
-      return { message: '更新成功!' };
+      await ctx.model.DayAmount.update({ date, dateType, total }, { where: { id } })
+      return { message: '更新成功!' }
     }
-    throw new Error(`日期 ${date} 已有值, 更新失败!`);
+    throw new Error(`日期 ${date} 已有值, 更新失败!`)
   }
 }
 
-module.exports = DayAmountService;
+module.exports = DayAmountService
