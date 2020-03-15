@@ -25,8 +25,7 @@ class DayAmountService extends Service {
     // 不传limit表示给 '/analysis' 使用 (analysis需要日期从小到大排列)
     const orderType = limit ? 'DESC' : 'ASC'
 
-    response.total = await ctx.model.DayAmount.count()
-    const list = await ctx.model.DayAmount.findAll({
+    const { count, rows: list } = await ctx.model.DayAmount.findAndCountAll({
       limit, offset,
       where: { ...whereQuery },
       order: [['date', orderType]],
@@ -37,6 +36,7 @@ class DayAmountService extends Service {
       response.list.push(dayAmountData)
     }
 
+    response.total = count
     return response
   }
 
