@@ -21,9 +21,9 @@ class DayAmountService extends Service {
     if (dateType) {
       whereQuery = { ...whereQuery, dateType }
     }
-    // 兼容analysis的访问 limit ? 'DESC' : 'ASC';
+    // 兼容analysis的访问
     // 不传limit表示给 '/analysis' 使用
-    const orderType = limit ? 'ASC' : 'ASC'
+    const orderType = limit ? 'DESC' : 'ASC'
 
     response.total = await ctx.model.DayAmount.count()
     const list = await ctx.model.DayAmount.findAll({
