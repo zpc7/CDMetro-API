@@ -15,10 +15,8 @@ class LineAmountService extends Service {
       total: 0,
       list: [],
     }
-    console.log('------------')
-    console.log('query', query)
     response.total = await ctx.model.LineAmount.count()
-    response.list = await this.ctx.model.LineAmount.findAll()
+    response.list = await this.ctx.model.LineAmount.findAll(query)
 
     return response
   }
@@ -26,11 +24,10 @@ class LineAmountService extends Service {
     return await this.ctx.model.LineAmount.findByPk(id)
   }
   async create(requestBody) {
+    const ctx = this.ctx
     const { date, dateType, remark, lineId, amount } = requestBody
 
-    return await this.ctx.model.LineAmount.create({
-      date, dateType, remark, lineId, amount,
-    })
+    return await ctx.model.LineAmount.create({ date, dateType, remark, lineId, amount })
   }
   // 通过日期删除数据
   async deleteByDate(date) {

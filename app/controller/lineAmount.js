@@ -10,7 +10,7 @@ function toInt(str) {
 class LineAmountController extends Controller {
   async index() {
     const ctx = this.ctx
-    const { page = 1, pageSize = 1 } = ctx.query
+    const { page = 1, pageSize = 10 } = ctx.query
     const query = { limit: toInt(pageSize), offset: (toInt(page) - 1) * toInt(pageSize) }
     ctx.body = await ctx.service.lineAmount.findAll(query)
   }
@@ -41,7 +41,6 @@ class LineAmountController extends Controller {
       }
       // 如果不传第二个参数会自动校验 `ctx.request.body`
       ctx.validate(rule, ctx.request.body)
-
     } catch (err) {
       ctx.logger.warn(err.errors)
       ctx.body = { message: '参数错误', err: err.errors }

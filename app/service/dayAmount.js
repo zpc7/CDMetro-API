@@ -22,7 +22,7 @@ class DayAmountService extends Service {
       whereQuery = { ...whereQuery, dateType }
     }
     // 兼容analysis的访问
-    // 不传limit表示给 '/analysis' 使用
+    // 不传limit表示给 '/analysis' 使用 (analysis需要日期从小到大排列)
     const orderType = limit ? 'DESC' : 'ASC'
 
     response.total = await ctx.model.DayAmount.count()
@@ -45,17 +45,14 @@ class DayAmountService extends Service {
   * @param {Model finaAllResponseListItem} ModelDayAmount 表day_amount中查询出来的一行
    */
   async getLineDataByModelDayAmount(ModelDayAmount) {
-    const item = ModelDayAmount
+    const { id, date, dateType, total } = ModelDayAmount
     const lineData = await this.ctx.model.LineAmount.findAll({
       attributes: ['lineId', 'amount'],
-      where: { date: item.date },
+      where: { date },
     })
     return {
-      id: item.id,
-      date: item.date,
-      dateType: item.dateType,
+      id, date, dateType, sum: total,
       lineData: lineData.map(v => ({ lineId: v.lineId, lineAmount: v.amount })),
-      sum: item.total,
     }
   }
   // 获取最近一天的数据
@@ -81,12 +78,13 @@ class DayAmountService extends Service {
           date, dateType, lineId: item.lineId, amount: item.lineAmount,
         })
       }
-      // 更新数据(这里的sum依靠前端的req 是否需要自己累加)
+      // 更新数据(sum依靠前端的req api没有再根据数据计算)
       const newDayAmount = await ctx.model.DayAmount.create({ date, dateType, total })
       return { message: '新增成功', id: newDayAmount.id }
     }
     throw new Error(`日期 ${date} 已有值, 新增失败!`)
   }
+
   async update({ id, previousDate }, requestBody) {
     const ctx = this.ctx
     const Op = this.app.Sequelize.Op
