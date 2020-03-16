@@ -13,6 +13,12 @@ class AnalysisController extends Controller {
     const ctx = this.ctx
     ctx.body = await ctx.service.dayAmount.findLastestData()
   }
+  // 获取月度分析数据
+  async findByMonth() {
+    const ctx = this.ctx
+    const { month } = ctx.params
+    ctx.body = await ctx.service.analysis.findAnalysisDataByMonth(month)
+  }
 }
 
 module.exports = AnalysisController
