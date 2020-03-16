@@ -17,7 +17,13 @@ class AnalysisController extends Controller {
   async findByMonth() {
     const ctx = this.ctx
     const { month } = ctx.params
-    ctx.body = await ctx.service.analysis.findAnalysisDataByMonth(month)
+    try {
+      ctx.body = await ctx.service.analysis.findAnalysisDataByMonth(month)
+    } catch (err) {
+      ctx.body = { message: '月份暂无数据' }
+      ctx.status = 500
+      return
+    }
   }
 }
 
