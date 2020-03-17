@@ -119,6 +119,29 @@ class AnalysisService extends Service {
     }
     return result
   }
+  // 最高纪录
+  async getHighestRecord() {
+    const ctx = this.ctx
+    const response = {
+      max: '',
+      maxDate: '',
+      lineMax: [],
+    }
+    const dayMaxInfo = await ctx.model.DayAmount.findOne({ order: [['total', 'DESC']] })
+    response.max = dayMaxInfo.total
+    response.maxDate = dayMaxInfo.date
+    // 获取所有线路
+    const allLine = await ctx.model.LineConfig.findAll()
+    for (const item of allLine) {
+      const lineMaxInfo = await ctx.model.LineAmount.findOne({ where: { lineId: item.id }, order: [['amount', 'DESC']] })
+      response.lineMax.push({
+        lineId: item.id,
+        value: lineMaxInfo.amount,
+        date: lineMaxInfo.date,
+      })
+    }
+    return response
+  }
 }
 
 module.exports = AnalysisService

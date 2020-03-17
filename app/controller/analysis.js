@@ -37,6 +37,11 @@ class AnalysisController extends Controller {
       return
     }
   }
+  // 获取历史最高纪录
+  async getHighestRecord() {
+    const ctx = this.ctx
+    ctx.body = await ctx.service.analysis.getHighestRecord()
+  }
 }
 
 module.exports = AnalysisController

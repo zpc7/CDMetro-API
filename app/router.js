@@ -11,6 +11,7 @@ module.exports = app => {
   router.get('/analysis/lastest', controller.analysis.findLastestData)
   router.get('/analysis/monthly/:month', controller.analysis.findByMonth)
   router.get('/analysis/monthly/dateType/:month', controller.analysis.findWithDateTypeByMonth)
+  router.get('/analysis/highestRecord', controller.analysis.getHighestRecord)
   // dayAmount: 某一天的完整数据,除了数据库表字段的 总运量,扩展具体的线路数据
   router.resources('dayAmount', '/dayAmount', controller.dayAmount)
   // lineAmount: 单条线路的运营数据
