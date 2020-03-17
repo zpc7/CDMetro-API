@@ -25,6 +25,18 @@ class AnalysisController extends Controller {
       return
     }
   }
+  // 获取月度不同日期类型分析数据
+  async findWithDateTypeByMonth() {
+    const ctx = this.ctx
+    const { month } = ctx.params
+    try {
+      ctx.body = await ctx.service.analysis.findAnalysisDataWithDateTypeByMonth(month)
+    } catch (err) {
+      ctx.body = { message: '月份暂无数据' }
+      ctx.status = 500
+      return
+    }
+  }
 }
 
 module.exports = AnalysisController

@@ -28,18 +28,9 @@ class AnalysisService extends Service {
     const response = {
       max: {},
       min: {},
-      currentMonth: {
-        average: '',
-        lineAverage: [],
-      },
-      lastMonth: {
-        average: '',
-        lineAverage: [],
-      },
-      sameMonthLastYear: {
-        average: '',
-        lineAverage: [],
-      },
+      currentMonth: { average: '', lineAverage: [] },
+      lastMonth: { average: '', lineAverage: [] },
+      sameMonthLastYear: { average: '', lineAverage: [] },
     }
     // max min
     const maxData = await ctx.model.DayAmount.findOne({ where: makeWhereQuery(dateRange), order: [['total', 'DESC']] })
@@ -56,6 +47,19 @@ class AnalysisService extends Service {
     response.lastMonth = await this.handleAverageData(lastMonthDateRange)
     response.sameMonthLastYear = await this.handleAverageData(sameMonthLastYearDateRange)
 
+    return response
+  }
+  // 获取月度不同日期类型分析数据
+  async findAnalysisDataWithDateTypeByMonth(month) {
+
+    const response = {
+      NWD: { average: '', lineAverage: [] },
+      TDBH: { average: '', lineAverage: [] },
+      SH: { average: '', lineAverage: [] },
+    }
+    response.NWD = await this.handleAverageDataByDateType('NWD', month)
+    response.TDBH = await this.handleAverageDataByDateType('TDBH', month)
+    response.SH = await this.handleAverageDataByDateType('SH', month)
     return response
   }
   // 计算平均值
@@ -77,6 +81,35 @@ class AnalysisService extends Service {
     for (const item of allLine) {
       const lineSum = await ctx.model.LineAmount.sum('amount', { where: { ...makeWhereQuery(dateRange), lineId: item.id } })
       const lineCount = await ctx.model.LineAmount.count({ where: { ...makeWhereQuery(dateRange), lineId: item.id } })
+      if (lineCount) {
+        result.lineAverage.push({
+          lineId: item.id,
+          average: Number(lineSum / lineCount).toFixed(2),
+        })
+      }
+    }
+    return result
+  }
+  // 计算日期类型平均值
+  async handleAverageDataByDateType(type, month) {
+    const ctx = this.ctx
+    const Op = this.app.Sequelize.Op
+    const { dateRange } = calculateDateRange(month)
+    const makeWhereQuery = dateType => ({ date: { [Op.between]: dateRange }, dateType })
+    const result = {
+      average: '',
+      lineAverage: [],
+    }
+    const dateTypeSum = await ctx.model.LineAmount.sum('amount', { where: makeWhereQuery(type) })
+    const dateTypeCount = await ctx.model.LineAmount.count({ where: makeWhereQuery(type) })
+    result.average = dateTypeCount ? Number(dateTypeSum / dateTypeCount).toFixed(2) : 0
+
+    // 获取所有线路
+    const allLine = await ctx.model.LineConfig.findAll()
+    // 各线路平均值
+    for (const item of allLine) {
+      const lineSum = await ctx.model.LineAmount.sum('amount', { where: { ...makeWhereQuery(type), lineId: item.id } })
+      const lineCount = await ctx.model.LineAmount.count({ where: { ...makeWhereQuery(type), lineId: item.id } })
       if (lineCount) {
         result.lineAverage.push({
           lineId: item.id,
