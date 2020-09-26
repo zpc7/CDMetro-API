@@ -136,8 +136,8 @@ class AnalysisService extends Service {
       const lineMaxInfo = await ctx.model.LineAmount.findOne({ where: { lineId: item.id }, order: [['amount', 'DESC']] })
       response.lineMax.push({
         lineId: item.id,
-        value: lineMaxInfo.amount,
-        date: lineMaxInfo.date,
+        value: lineMaxInfo ? lineMaxInfo.amount : '暂无数据',
+        date: lineMaxInfo ? lineMaxInfo.date : '暂无数据',
       })
     }
     return response
