@@ -12,9 +12,11 @@ class LineConfigService extends Service {
     return await this.ctx.model.LineConfig.findByPk(id)
   }
   async create(requestBody) {
-    const { lineColor, lineNumber, openDate, lineType } = requestBody
+    const { lineColor, lineNumber, openDate, lineType, metroFormation } = requestBody
 
-    return await this.ctx.model.LineConfig.create({ lineColor, lineNumber, openDate, lineType })
+    return await this.ctx.model.LineConfig.create({
+      lineColor, lineNumber, openDate, lineType, metroFormation,
+    })
   }
 }
 
