@@ -23,6 +23,7 @@ module.exports = appInfo => {
     host: '127.0.0.1',
     port: 3306,
     database: 'CDMetro-default',
+    password: 'p@ssword7',
     define: {
       timestamps: true, // 添加create,update,delete时间戳
       freezeTableName: true, // 防止修改表名为复数

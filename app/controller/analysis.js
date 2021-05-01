@@ -20,7 +20,7 @@ class AnalysisController extends Controller {
     try {
       ctx.body = await ctx.service.analysis.findAnalysisDataByMonth(month)
     } catch (err) {
-      ctx.body = { message: '月份暂无数据' }
+      ctx.body = { message: `${month}月份暂无数据` }
       ctx.status = 500
       return
     }
